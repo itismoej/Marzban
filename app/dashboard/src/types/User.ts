@@ -1,3 +1,4 @@
+export type RandomSNIStatus = "enabled" | "disabled";
 export type UserStatus = "active" | "disabled" | "limited" | "expired";
 export type ProxyKeys = ("vmess" | "vless" | "trojan" | "shadowsocks")[];
 export type ProxyType = {
@@ -35,6 +36,7 @@ export type User = {
   links: string[];
   subscription_url: string;
   inbounds: UserInbounds;
+  random_sni: RandomSNIStatus;
 };
 
 export type UserCreate = Pick<
@@ -46,4 +48,5 @@ export type UserCreate = Pick<
   | "data_limit_reset_strategy"
   | "username"
   | "status"
+  | "random_sni"
 >;

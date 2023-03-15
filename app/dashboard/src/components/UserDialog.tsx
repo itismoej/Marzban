@@ -1,8 +1,11 @@
 import {
   Alert,
   AlertIcon,
+  Box,
   Button,
   chakra,
+  Collapse,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -16,39 +19,30 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   SimpleGrid,
   Spinner,
+  Switch,
   Text,
   Tooltip,
   useToast,
   VStack,
-  Select,
-  Collapse,
-  Flex,
-  Switch,
-  Box,
 } from "@chakra-ui/react";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/outline";
-import { ProtocolType, useDashboard } from "contexts/DashboardContext";
-import { FC, useEffect, useState } from "react";
-import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
-import {
-  ProxyKeys,
-  ProxyType,
-  User,
-  UserCreate,
-  UserInbounds,
-} from "types/User";
-import { z } from "zod";
-import { Icon } from "./Icon";
-import { RadioGroup } from "./RadioGroup";
-import { Input } from "./Input";
+import {PencilIcon, UserPlusIcon} from "@heroicons/react/24/outline";
+import {useDashboard} from "contexts/DashboardContext";
+import {FC, useEffect, useState} from "react";
+import {Controller, FormProvider, useForm, useWatch} from "react-hook-form";
+import {ProxyKeys, ProxyType, User, UserCreate, UserInbounds,} from "types/User";
+import {z} from "zod";
+import {Icon} from "./Icon";
+import {RadioGroup} from "./RadioGroup";
+import {Input} from "./Input";
 import ReactDatePicker from "react-datepicker";
 import dayjs from "dayjs";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { relativeExpiryDate } from "utils/dateFormatter";
-import { DeleteIcon } from "./DeleteUserModal";
-import { resetStrategy } from "constants/UserSettings";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {relativeExpiryDate} from "utils/dateFormatter";
+import {DeleteIcon} from "./DeleteUserModal";
+import {resetStrategy} from "constants/UserSettings";
 
 const AddUserIcon = chakra(UserPlusIcon, {
   baseStyle: {
@@ -87,6 +81,7 @@ const schema = z.object({
     })
     return ins
   }),
+  random_sni: z.string(),
 });
 
 export type UserDialogProps = {};
@@ -116,6 +111,7 @@ const getDefaultValues = (): FormType => {
     data_limit_reset_strategy: "no_reset",
     status: "active",
     inbounds,
+    random_sni: "enabled",
   };
 };
 
@@ -196,6 +192,10 @@ export const UserDialog: FC<UserDialogProps> = () => {
         values.status === "active" || values.status === "disabled"
           ? values.status
           : "active",
+      random_sni:
+        values.random_sni === "enabled" || values.random_sni === "disabled"
+          ? values.random_sni
+          : "disabled",
     };
 
     methods[method](body)
@@ -524,6 +524,33 @@ export const UserDialog: FC<UserDialogProps> = () => {
                       <Button onClick={handleResetUsage} size="sm">
                         Reset Usage
                       </Button>
+                      <Controller
+                          name="random_sni"
+                          control={form.control}
+                          render={({ field }) => {
+                            return (
+                              <Tooltip
+                                placement="top"
+                                label={"random SNI: " + field.value}
+                                textTransform="capitalize"
+                              >
+                                <Box>
+                                  <Switch
+                                    colorScheme="primary"
+                                    isChecked={field.value === "enabled"}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        field.onChange("enabled");
+                                      } else {
+                                        field.onChange("disabled");
+                                      }
+                                    }}
+                                  />
+                                </Box>
+                              </Tooltip>
+                            );
+                          }}
+                        />
                     </>
                   )}
                 </HStack>
